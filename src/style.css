@@ -1,0 +1,179 @@
+body {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  
+  .carousel-item img {
+    object-fit: cover;
+    height: 60vh;
+  }
+  
+  .carousel-caption {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+  }
+  
+  .room-card {
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .room-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .room-image {
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .social-icons a {
+    font-size: 1.5rem;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .social-icons a:hover {
+    color: #007bff !important;
+  }
+  
+  #customAlert {
+    position: fixed;
+    top: 4rem;
+    right: 20px;
+    z-index: 1050;
+  }
+
+  
+  
+  html {
+    scroll-padding-top: 70px; /* Adjust the value based on your navbar height */
+  }
+  
+  body {
+    padding-top: 56px; /* Adjust this value to match your navbar height */
+  }
+  
+  .navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  }
+  
+  .review-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px; /* Updated max-width */
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  
+  .review-slider {
+    display: flex;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .review-card {
+    flex: 0 0 100%;
+    padding: 30px; /* Updated padding */
+    background-color: #f8f9fa;
+    border-radius: 15px; /* Updated border-radius */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Updated box-shadow */
+    margin: 20px; /* Added margin */
+    transition: transform 0.3s ease-in-out; /* Added transition */
+  }
+  
+  .review-card:hover {
+    transform: translateY(-5px); /* Added hover effect */
+  }
+  
+  .review-card h5 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
+  .review-card p {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+  
+  .review-author {
+    display: flex;
+    align-items: center;
+  }
+  
+  .review-author img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+  }
+  
+  .review-author-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .review-author-name {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .review-author-location {
+    font-size: 0.9em;
+    color: #666;
+  }
+  
+  .review-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 50%;
+  }
+  
+  .review-nav.prev {
+    left: 10px;
+  }
+  
+  .review-nav.next {
+    right: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .review-nav {
+      display: none;
+    }
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 5%;
+  }
+  
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 10px;
+  }
+
+  #about {
+    padding: 20px;
+    background-color: #212529;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    color: white;
+  }
+  
+  
