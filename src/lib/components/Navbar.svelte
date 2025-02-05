@@ -1,5 +1,10 @@
 <script>
-	import { bookings } from '$lib/store';
+	import { page } from '$app/stores';
+	import { bookings, isLoggedIn, userGroup } from '$lib/store';
+
+	async function openBooking() {
+		
+	}
 
 	async function handleGetBookings() {
 		let res = await fetch('/api/Booking/bookings', {
@@ -11,17 +16,21 @@
 		let data = await res.json();
 		$bookings = data;
 	}
+
 	function handleLogout() {
 		localStorage.removeItem('AuthToken');
+		$isLoggedIn = false;
+		$userGroup = '';
+		window.location.href = '/';
 		showAlert('Sikeres kijelentkezés.', 'success');
-		updateUIForLoggedOutUser();
+		// updateUIForLoggedOutUser();
 	}
 
-	function updateUIForLoggedOutUser() {
-		document.getElementById('loginRegisterNav').classList.remove('d-none');
-		document.getElementById('logoutNav').classList.add('d-none');
-		document.getElementById('profileNav').classList.add('d-none');
-	}
+	// function updateUIForLoggedOutUser() {
+	// 	document.getElementById('loginRegisterNav').classList.remove('d-none');
+	// 	document.getElementById('logoutNav').classList.add('d-none');
+	// 	document.getElementById('profileNav').classList.add('d-none');
+	// }
 
 	function showAlert(message, type) {
 		const alertElement = document.getElementById('customAlert');
@@ -33,11 +42,14 @@
 			alertElement.classList.add('d-none');
 		}, 3000);
 	}
+	$effect(() => {
+		$isLoggedIn = localStorage.getItem('AuthToken') ? true : false;
+	});
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
 	<div class="container">
-		<a class="navbar-brand" href="#">DreamStay</a>
+		<a class="navbar-brand" href="/">DreamStay</a>
 		<button
 			class="navbar-toggler"
 			type="button"
@@ -52,37 +64,48 @@
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav me-auto">
 				<li class="nav-item">
-					<a class="nav-link active" href="#">Főoldal</a>
+					<a class="nav-link active" href="/">Főoldal</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="#rooms">Szobák</a>
+					<a class="nav-link" href="/#rooms">Szobák</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="#about">Rólunk</a>
+					<a class="nav-link" href="/#about">Rólunk</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="#contact">Kapcsolat</a>
+					<a class="nav-link" href="/#contact">Kapcsolat</a>
 				</li>
+				{#if $userGroup === 'Admin'}
+					<li class="nav-item">
+						<a class="nav-link" href="/admin">Admin felület</a>
+					</li>
+				{/if}
 			</ul>
 			<ul class="navbar-nav">
-				<li class="nav-item" id="loginRegisterNav">
-					<a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
-						>Bejelentkezés / Regisztráció</a
-					>
-				</li>
-				<li class="nav-item d-none" id="logoutNav">
-					<a class="nav-link" href="#" id="logoutBtn" onclick={handleLogout}>Kijelentkezés</a>
-				</li>
-				<li class="nav-item d-none" id="profileNav">
-					<button
-						onclick={handleGetBookings}
-						class="nav-link"
-						data-bs-toggle="modal"
-						data-bs-target="#profileModal"
-					>
-						<i class="bi bi-person-circle"></i>
-					</button>
-				</li>
+				{#if $isLoggedIn === false}
+					<li class="nav-item" id="loginRegisterNav">
+						<a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
+							>Bejelentkezés / Regisztráció</a
+						>
+					</li>
+				{:else}
+					<li class="nav-item" id="logoutNav">
+						<a class="nav-link" href="#" id="logoutBtn" onclick={handleLogout}>Kijelentkezés</a>
+					</li>
+
+					{#if $page.url.pathname !== '/admin'}
+						<li class="nav-item" id="profileNav">
+							<button
+								onclick={handleGetBookings}
+								class="nav-link"
+								data-bs-toggle="modal"
+								data-bs-target="#profileModal"
+							>
+								<i class="bi bi-person-circle"></i>
+							</button>
+						</li>
+					{/if}
+				{/if}
 			</ul>
 		</div>
 	</div>

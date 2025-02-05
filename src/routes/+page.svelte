@@ -6,17 +6,10 @@
 	import { bookings } from '$lib/store';
 	import { onMount } from 'svelte';
 	import { Swiper } from 'swiper';
-
-	async function clearFilters() {
-		const res = await fetch('/api/Room/rooms', { method: 'GET' });
-		const data = await res.json();
-		rooms = data;
-		console.log(rooms);
-	}
-	
 	let currentRoom = $state();
-	async function openBooking(currentId) {
-		const response = await fetch(`/api/Room/rooms/${currentId}`);
+
+	async function openBooking(currentRoomIndex) {
+		const response = await fetch(`/api/Room/rooms/${currentRoomIndex}`);
 		const data = await response.json();
 
 		currentRoom = data;
@@ -42,14 +35,11 @@
 				roomId: currentRoom.id
 			})
 		});
-
-		console.log(res);
-
 		if (res.ok) {
 			const bookingModal = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
 			bookingModal.hide();
 			checkIn.value = '';
-            checkOut.value = '';
+			checkOut.value = '';
 			setTimeout(() => {
 				showAlert('Foglalása sikeresen megtörtént.', 'success');
 			}, 450);
@@ -93,26 +83,13 @@
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				maxAdults: adults.value,
-				maxChildren: children.value
+				maxChildren: children.value,
+				checkInDate: checkIn.value
 			})
 		});
 
 		const data = await res.json();
 		rooms = data;
-	}
-
-	function updateUIForLoggedInUser() {
-		document.getElementById('loginRegisterNav').classList.add('d-none');
-		document.getElementById('logoutNav').classList.remove('d-none');
-		document.getElementById('profileNav').classList.remove('d-none');
-		//   displayUserBookings();
-	}
-
-	// Function to update UI for logged-out user
-	function updateUIForLoggedOutUser() {
-		document.getElementById('loginRegisterNav').classList.remove('d-none');
-		document.getElementById('logoutNav').classList.add('d-none');
-		document.getElementById('profileNav').classList.add('d-none');
 	}
 
 	function showAlert(message, type) {
@@ -131,11 +108,6 @@
 		const res = await fetch('/api/Room/rooms', { method: 'GET' });
 		const data = await res.json();
 		rooms = data;
-		if (localStorage.getItem('AuthToken')) {
-			updateUIForLoggedInUser();
-		} else {
-			updateUIForLoggedOutUser();
-		}
 	});
 
 	const reviews = [
@@ -193,7 +165,6 @@
 				email: registerEmail.value
 			})
 		});
-
 		const data = await res.text();
 
 		if (res.ok) {
@@ -215,16 +186,16 @@
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ userName: loginUsername.value, password: loginPassword.value })
 		});
-
 		const data = await res.text();
 
 		if (res.ok) {
 			localStorage.setItem('AuthToken', data);
+			window.location.href = '/';
 			const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
 			loginModal.hide();
 			setTimeout(() => {
 				showAlert('Sikeres bejelentkezés.', 'success');
-				updateUIForLoggedInUser();
+				// updateUIForLoggedInUser();
 			}, 450);
 			return;
 		}
@@ -296,14 +267,6 @@
 			<h2 class="mb-4">Találja meg a tökéletes szobát önnek.</h2>
 			<form id="searchForm" onsubmit={handleFilter}>
 				<div class="row g-3">
-					<!-- <div class="col-md-3">
-						<label for="checkIn" class="form-label">Érkezés</label>
-						<input type="date" class="form-control" id="checkIn" required />
-					</div>
-					<div class="col-md-3">
-						<label for="checkOut" class="form-label">Távozás</label>
-						<input type="date" class="form-control" id="checkOut" required />
-					</div> -->
 					<div class="col-md-2">
 						<label for="adults" class="form-label">Felnőttek</label>
 						<select class="form-select" id="adults" required>
@@ -327,9 +290,6 @@
 					</div>
 					<div class="col-md-2 d-flex align-items-end">
 						<button type="submit" class="btn btn-dark w-100">Keresés</button>
-					</div>
-					<div class="col-md-2 d-flex align-items-end">
-						<button class ="btn btn-dark w-100" onclick= {clearFilters}>Szűrés törlése</button>
 					</div>
 				</div>
 			</form>
@@ -627,36 +587,47 @@
 			</div>
 		</div>
 	</div>
-	<!-- Foglalás Modal -->
-<!-- Modal -->
-<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
-	  <div class="modal-content rounded-4 border-0">
-		<div class="modal-header bg-dark text-white">
-		  <h5 class="modal-title" id="bookingModalLabel">{currentRoom?.name}</h5>
-		  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Bezárás"></button>
-		</div>
-		<div class="modal-body p-4">
-		  <h6 class="fw-bold">Leírás</h6>
-		  <p class="text-muted">{currentRoom?.description}</p>
-  
-		  <div class="row g-3">
-			<div class="col-md-6">
-			  <label for="checkIn" class="form-label fw-semibold">Érkezés</label>
-			  <input type="date" class="form-control" id="checkIn" required />
+
+	<div
+		class="modal fade"
+		id="bookingModal"
+		tabindex="-1"
+		aria-labelledby="bookingModalLabel"
+		aria-hidden="true"
+	>
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content rounded-4 border-0">
+				<div class="modal-header bg-dark text-white">
+					<h5 class="modal-title" id="bookingModalLabel">{currentRoom?.name}</h5>
+					<button
+						type="button"
+						class="btn-close btn-close-white"
+						data-bs-dismiss="modal"
+						aria-label="Bezárás"
+					></button>
+				</div>
+				<div class="modal-body p-4">
+					<h6 class="fw-bold">Leírás</h6>
+					<p class="text-muted">{currentRoom?.description}</p>
+
+					<div class="row g-3">
+						<div class="col-md-6">
+							<label for="checkIn" class="form-label fw-semibold">Érkezés</label>
+							<input type="date" class="form-control" id="checkIn" required />
+						</div>
+						<div class="col-md-6">
+							<label for="checkOut" class="form-label fw-semibold">Távozás</label>
+							<input type="date" class="form-control" id="checkOut" required />
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer d-flex justify-content-between">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+						>Mégse</button
+					>
+					<button onclick={handleBooking} class="btn btn-outline-secondary">Foglalás</button>
+				</div>
 			</div>
-			<div class="col-md-6">
-			  <label for="checkOut" class="form-label fw-semibold">Távozás</label>
-			  <input type="date" class="form-control" id="checkOut" required />
-			</div>
-		  </div>
 		</div>
-		<div class="modal-footer d-flex justify-content-between">
-		  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Mégse</button>
-		  <button onclick="{handleBooking}" class="btn btn-outline-secondary">Foglalás</button>
-		</div>
-	  </div>
 	</div>
-  </div>
-  
 </div>
